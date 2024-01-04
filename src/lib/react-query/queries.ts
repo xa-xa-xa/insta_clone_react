@@ -1,31 +1,13 @@
-import {
-  useQuery,
-  useMutation,
-  useQueryClient,
-  useInfiniteQuery,
-} from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 
 import { QUERY_KEYS } from "@/lib/react-query/queryKeys";
 import {
   createUserAccount,
   signInAccount,
   getCurrentUser,
-  getUsers,
-  createPost,
-  getPostById,
-  updatePost,
-  getUserPosts,
-  deletePost,
-  likePost,
-  getUserById,
-  updateUser,
-  getRecentPosts,
-  getInfinitePosts,
-  searchPosts,
-  savePost,
-  deleteSavedPost,
+  signOutAccount,
 } from "@/lib/appwrite/api";
-import { INewPost, INewUser, IUpdatePost, IUpdateUser } from "@/types";
+import { INewUser } from "@/types";
 
 // ============================================================
 // AUTH QUERIES
@@ -44,6 +26,9 @@ export const useSignInAccount = () => {
   });
 };
 
+export const useSignOutAccount = () => {
+  return useMutation({ mutationFn: signOutAccount });
+};
 
 // ============================================================
 // USER QUERIES
@@ -55,4 +40,3 @@ export const useGetCurrentUser = () => {
     queryFn: getCurrentUser,
   });
 };
-

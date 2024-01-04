@@ -1,7 +1,8 @@
-import { ID, Query } from "appwrite";
+import { AppwriteException, ID, Query } from "appwrite";
 
 import { appwriteConfig, account, databases, storage, avatars } from "./config";
-import { IUpdatePost, INewPost, INewUser, IUpdateUser } from "@/types";
+import { INewUser } from "@/types";
+import { toast } from "@/components/ui";
 
 // ============================================================
 // AUTH
@@ -65,7 +66,20 @@ export async function signInAccount(user: { email: string; password: string }) {
 
     return session;
   } catch (error) {
-    console.log(error);
+    const error$ = error as AppwriteException;
+    console.log("🚀 ~ file: api.ts:70 ~ signInAccount ~ Error:", { error$ });
+    console.error(error);
+    toast({ title: `${error$.message}` });
+  }
+}
+// ============================== SIGN OUT
+export async function signOutAccount() {
+  try {
+    const session = await account.deleteSession("current");
+
+    return session;
+  } catch (error) {
+    console.error(error);
   }
 }
 
@@ -97,6 +111,7 @@ export async function getCurrentUser() {
 
     return currentUser.documents[0];
   } catch (error) {
+    console.log("🚀 ~ file: api.ts:100 ~ getCurrentUser ~ error:", error);
     console.log(error);
     return null;
   }
