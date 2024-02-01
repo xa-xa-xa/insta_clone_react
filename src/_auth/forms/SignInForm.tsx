@@ -19,7 +19,6 @@ import Loader from "@/components/ui/Loader";
 import { useSignInAccount } from "@/lib/react-query/queries";
 import { SigninValidation } from "@/lib/validation";
 import { useUserContext } from "@/context/AuthContext";
-import { AppwriteException } from "appwrite";
 import LogoImage from "@/components/shared/Logo";
 
 const SigninForm = () => {

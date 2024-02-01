@@ -60,17 +60,8 @@ export async function saveUserToDB(user: {
 }
 
 // ============================== SIGN IN
-export async function signInAccount(user: { email: string; password: string }) {
-  try {
-    const session = await account.createEmailSession(user.email, user.password);
-
-    return session;
-  } catch (error) {
-    const error$ = error as AppwriteException;
-    console.log("🚀 ~ file: api.ts:70 ~ signInAccount ~ Error:", { error$ });
-    console.error(error);
-    toast({ title: `${error$.message}` });
-  }
+export function signInAccount(user: { email: string; password: string }) {
+  return account.createEmailSession(user.email, user.password);
 }
 // ============================== SIGN OUT
 export async function signOutAccount() {

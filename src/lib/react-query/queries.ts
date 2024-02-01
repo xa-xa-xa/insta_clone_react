@@ -8,6 +8,8 @@ import {
   signOutAccount,
 } from "@/lib/appwrite/api";
 import { INewUser } from "@/types";
+import { toast } from "@/components/ui";
+import { AppwriteException } from "appwrite";
 
 // ============================================================
 // AUTH QUERIES
@@ -23,6 +25,13 @@ export const useSignInAccount = () => {
   return useMutation({
     mutationFn: (user: { email: string; password: string }) =>
       signInAccount(user),
+    onError: (error) => {
+      if (error instanceof AppwriteException) {
+        toast({ title: error.message });
+      } else {
+        console.error(error);
+      }
+    },
   });
 };
 
