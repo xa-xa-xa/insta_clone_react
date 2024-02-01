@@ -18,7 +18,6 @@ import { Textarea } from "../ui/textarea";
 import FileUploader from "../shared/FileUploader";
 import { PostValidation } from "@/lib/validation";
 
-
 function PostForm({ post }) {
   // 1. Define your form.
   const form = useForm<z.infer<typeof PostValidation>>({
@@ -26,7 +25,7 @@ function PostForm({ post }) {
     defaultValues: {
       caption: post?.caption ?? "",
       location: post?.location ?? "",
-      tags: post?.tags?.join(",") ?? ""
+      tags: post?.tags?.join(",") ?? "",
     },
   });
 
