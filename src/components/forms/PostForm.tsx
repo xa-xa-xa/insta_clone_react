@@ -17,8 +17,24 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "../ui/textarea";
 import FileUploader from "../shared/FileUploader";
 import { PostValidation } from "@/lib/validation";
+import { Models } from "appwrite";
+import { useCreatePost, useSignInAccount } from "@/lib/react-query/queries";
+import { useUserContext } from "@/context/AuthContext";
+import { useToast } from "../ui";
+import { useNavigate } from "react-router-dom";
+import { Loader } from "lucide-react";
 
-function PostForm({ post }) {
+type PostFormProps = {
+  post?: Models.Document;
+};
+
+function PostForm({ post }: PostFormProps) {
+  const { mutateAsync: createPost, isLoading: isLoadingCreate } =
+    useCreatePost();
+  const { user } = useUserContext();
+  const { toast } = useToast();
+  const navigate = useNavigate();
+
   // 1. Define your form.
   const form = useForm<z.infer<typeof PostValidation>>({
     resolver: zodResolver(PostValidation),
@@ -30,10 +46,14 @@ function PostForm({ post }) {
   });
 
   // 2. Define a submit handler.
-  function onSubmit(values: z.infer<typeof PostValidation>) {
-    // Do something with the form values.
+  async function onSubmit(values: z.infer<typeof PostValidation>) {
+    const newPost = await createPost({ ...values, userId: user.id });
     // ✅ This will be type-safe and validated.
-    console.log(values);
+    if (!newPost) {
+      toast({ title: "Please try again." });
+    }
+
+    navigate("/");
   }
 
   //
@@ -84,7 +104,7 @@ function PostForm({ post }) {
             <FormItem>
               <FormLabel className="shad-form-_label">Add Location</FormLabel>
               <FormControl>
-                <Input type="text" className="shad-input" />
+                <Input type="text" className="shad-input" {...field} />
               </FormControl>
 
               <FormMessage className="shad-form_message" />
@@ -104,6 +124,7 @@ function PostForm({ post }) {
                   type="text"
                   className="shad-input"
                   placeholder="Art, Expression, Education, Fun...etc"
+                  {...field}
                 />
               </FormControl>
 
@@ -112,13 +133,18 @@ function PostForm({ post }) {
           )}
         />
         <div className="flex gap-4 items-center justify-end">
-          <Button type="button" className="shad-button_dark_4">
+          <Button
+            type="button"
+            className="shad-button_dark_4"
+            onClick={() => navigate("/")}>
             Cancel
           </Button>
           <Button
             type="submit"
-            className="shad-button_primary whitespace-nowrap">
-            Submit
+            className="shad-button_primary whitespace-nowrap"
+            disabled={isLoadingCreate}>
+            {isLoadingCreate && <Loader />}
+            Post
           </Button>
         </div>
       </form>

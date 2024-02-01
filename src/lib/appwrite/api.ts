@@ -1,8 +1,9 @@
-import { AppwriteException, ID, Query } from "appwrite";
+import { AppwriteException, ID, Models, Query } from "appwrite";
 
 import { appwriteConfig, account, databases, storage, avatars } from "./config";
-import { INewUser } from "@/types";
+import { INewPost, INewUser } from "@/types";
 import { toast } from "@/components/ui";
+import { URL } from "url";
 
 // ============================================================
 // AUTH
@@ -105,5 +106,103 @@ export async function getCurrentUser() {
     console.log("🚀 ~ file: api.ts:100 ~ getCurrentUser ~ error:", error);
     console.log(error);
     return null;
+  }
+}
+
+// ============================== UPLOAD FILE
+export async function uploadFile(file: File): Promise<Models.File | undefined> {
+  try {
+    const uploadedFile = await storage.createFile(
+      appwriteConfig.storageId,
+      ID.unique(),
+      file
+    );
+
+    return uploadedFile;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// ============================== GET FILE URL
+
+function getFilePreview(fileId: string) {
+  try {
+    const fileUrl = storage.getFilePreview(
+      appwriteConfig.storageId,
+      fileId,
+      2000,
+      2000,
+      "top",
+      100
+    );
+
+    if (!fileUrl) {
+      throw Error;
+    }
+    return fileUrl;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// ============================== DELETE FILE
+export async function deleteFile(fileId: string) {
+  try {
+    await storage.getFile(appwriteConfig.storageId, fileId);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// ============================================================
+// POSTS
+// ============================================================
+
+// ============================== CREATE POST
+
+export async function createPost(post: INewPost) {
+  try {
+    // Upload file to appwrite storage
+    const uploadedFile = await uploadFile(post.file[0]);
+    let fileUrl; // FIXME: type
+
+    if (!uploadedFile) {
+      throw Error;
+    } else {
+      //Get file url
+      fileUrl = getFilePreview(uploadedFile.$id);
+      if (!fileUrl) {
+        await deleteFile(uploadedFile.$id);
+        throw Error;
+      }
+    }
+
+    // Convert tags inot array
+    const tags = post.tags?.replace(/ /g, "").split(",") || [];
+
+    // Create post
+    const { userId, caption, location } = post;
+    const newPost = await databases.createDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.postCollectionId,
+      ID.unique(),
+      {
+        creator: userId,
+        caption,
+        image: fileUrl,
+        imageId: uploadedFile.$id,
+        location,
+        tags,
+      }
+    );
+
+    if (!newPost) {
+      await deleteFile(uploadedFile.$id);
+      throw Error;
+    }
+    return newPost;
+  } catch (error) {
+    console.error(error);
   }
 }
