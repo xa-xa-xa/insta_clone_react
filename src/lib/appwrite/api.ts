@@ -1,9 +1,8 @@
-import { AppwriteException, ID, Models, Query } from "appwrite";
+import { ID, Models, Query } from "appwrite";
 
-import { appwriteConfig, account, databases, storage, avatars } from "./config";
 import { INewPost, INewUser } from "@/types";
-import { toast } from "@/components/ui";
 import { URL } from "url";
+import { account, appwriteConfig, avatars, databases, storage } from "./config";
 
 // ============================================================
 // AUTH
@@ -150,6 +149,7 @@ function getFilePreview(fileId: string) {
 export async function deleteFile(fileId: string) {
   try {
     await storage.getFile(appwriteConfig.storageId, fileId);
+    return { status: "ok" };
   } catch (error) {
     console.error(error);
   }
@@ -190,7 +190,7 @@ export async function createPost(post: INewPost) {
       {
         creator: userId,
         caption,
-        image: fileUrl,
+        imageUrl: fileUrl,
         imageId: uploadedFile.$id,
         location,
         tags,
@@ -202,6 +202,77 @@ export async function createPost(post: INewPost) {
       throw Error;
     }
     return newPost;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// ============================== GET RECENT POSTS
+export async function getRecentPosts() {
+  const posts = databases.listDocuments(
+    appwriteConfig.databaseId,
+    appwriteConfig.postCollectionId,
+    [Query.orderDesc("$createdAt"), Query.limit(20)]
+  );
+
+  if (!posts) {
+    throw Error;
+  }
+  return posts;
+}
+
+// ============================== LIKE POST
+export async function likePost(postId: string, likes: string[]) {
+  try {
+    const updatedPost = await databases.updateDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.postCollectionId,
+      postId,
+      {
+        likes: likes,
+      }
+    );
+
+    if (!updatedPost) {
+      throw Error;
+    }
+    return updatedPost;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// ============================== SAVE POST
+export async function savePost(postId: string, userId: string) {
+  try {
+    const updatedPost = await databases.createDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.savesCollectionId,
+      ID.unique(),
+      { user: userId, post: postId }
+    );
+
+    if (!updatedPost) {
+      throw Error;
+    }
+    return updatedPost;
+  } catch (error) {
+    console.error(error);
+  }
+}
+// ============================== DELETE SAVED POST
+export async function deletSavedPost(savedRecordId: string) {
+  try {
+    const statusCode = await databases.deleteDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.savesCollectionId,
+      savedRecordId
+    );
+
+    if (!statusCode) {
+      throw Error;
+    }
+    return { status: "ok" };
   } catch (error) {
     console.error(error);
   }

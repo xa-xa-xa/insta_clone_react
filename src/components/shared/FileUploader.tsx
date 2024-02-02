@@ -1,7 +1,7 @@
-import React, { useCallback, useState } from "react";
+import { toastError } from "@/lib/utils";
+import { useCallback, useState } from "react";
 import { FileWithPath, useDropzone } from "react-dropzone";
 import { Button } from "../ui";
-import { log } from "console";
 
 type FileUploaderProps = {
   fieldChange: (file: File[]) => void;
@@ -23,7 +23,10 @@ function FileUploader({ fieldChange, mediaUrl }: FileUploaderProps) {
 
   const { getRootProps, getInputProps } = useDropzone({
     onDrop,
-    accept: { "image/*": [".png", ".jpeg", ".jpg", ".svg", ".gif", ".webp"] },
+    accept: {
+      "image/*": [".png", ".jpeg", ".jpg", ".svg", ".gif", ".webp"],
+    },
+    onError: () => toastError("wrong file format"),
   });
 
   return (

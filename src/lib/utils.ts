@@ -1,6 +1,6 @@
 import { toast } from "@/components/ui";
 import { AppwriteException } from "appwrite";
-import { type ClassValue, clsx } from "clsx";
+import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
@@ -63,6 +63,38 @@ export const multiFormatDateString = (timestamp: string = ""): string => {
   }
 };
 
-export const checkIsLiked = (likeList: string[], userId: string) => {
-  return likeList.includes(userId);
+export const getLikeIconUrl = (likeList: string[], userId: string): string => {
+  return likeList.includes(userId)
+    ? "/public/assets/icons/liked.svg"
+    : "/public/assets/icons/like.svg";
 };
+
+export function formatRelativeDate(dateString: string): string {
+  const currentDate = new Date();
+  const inputDate = new Date(dateString);
+
+  const timeDifference = currentDate.getTime() - inputDate.getTime();
+  const secondsDifference = Math.floor(timeDifference / 1000);
+
+  const minutes = Math.floor(secondsDifference / 60);
+  const hours = Math.floor(minutes / 60);
+  const days = Math.floor(hours / 24);
+  const months = Math.floor(days / 30);
+  const years = Math.floor(days / 365);
+
+  if (years > 0) {
+    return `${years} year${years > 1 ? "s" : ""} ago`;
+  } else if (months > 0) {
+    return `${months} month${months > 1 ? "s" : ""} ago`;
+  } else if (days > 1) {
+    return `${days} day${days > 1 ? "s" : ""} ago`;
+  } else if (days === 1) {
+    return "yesterday";
+  } else if (hours > 0) {
+    return `${hours} hour${hours > 1 ? "s" : ""} ago`;
+  } else if (minutes > 0) {
+    return `${minutes} minute${minutes > 1 ? "s" : ""} ago`;
+  } else {
+    return "just now";
+  }
+}

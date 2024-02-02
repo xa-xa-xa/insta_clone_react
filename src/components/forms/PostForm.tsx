@@ -22,7 +22,7 @@ import { useCreatePost, useSignInAccount } from "@/lib/react-query/queries";
 import { useUserContext } from "@/context/AuthContext";
 import { useToast } from "../ui";
 import { useNavigate } from "react-router-dom";
-import { Loader } from "lucide-react";
+import Loader from "../ui/Loader";
 
 type PostFormProps = {
   post?: Models.Document;

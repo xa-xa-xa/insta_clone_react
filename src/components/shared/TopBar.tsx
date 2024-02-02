@@ -1,9 +1,9 @@
-import React, { useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import LogoImage from "./Logo";
-import { Button } from "../ui";
-import { useSignOutAccount } from "@/lib/react-query/queries";
 import { useUserContext } from "@/context/AuthContext";
+import { useSignOutAccount } from "@/lib/react-query/queries";
+import { useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { Button } from "../ui";
+import LogoImage from "./Logo";
 
 function Topbar() {
   const { mutate: signOut, isSuccess } = useSignOutAccount();
@@ -31,7 +31,7 @@ function Topbar() {
           </Button>
           <Link to={`/profile/${user.id}`} className="flex-center gap-3">
             <img
-              src={user?.imageUrl || "/assets/images/profile-placeholder.cvs"}
+              src={user?.imageUrl || "/assets/icons/profile-placeholder.svg"}
               className="h-8 w-8 rounded-full"
             />
           </Link>

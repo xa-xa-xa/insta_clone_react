@@ -1,8 +1,8 @@
-import { useNavigate } from "react-router-dom";
 import { createContext, useContext, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-import { IUser } from "@/types";
 import { getCurrentUser } from "@/lib/appwrite/api";
+import { IUser } from "@/types";
 
 export const INITIAL_USER = {
   id: "",
@@ -43,10 +43,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsLoading(true);
     try {
       const currentAccount = await getCurrentUser();
-      console.log(
-        "🚀 ~ file: AuthContext.tsx:46 ~ checkAuthUser ~ currentAccount:",
-        currentAccount
-      );
+
       if (currentAccount) {
         setUser({
           id: currentAccount.$id,
@@ -81,10 +78,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // cookieFallback === null ||
     // cookieFallback === undefined
     if (cookieFallback) {
-      console.log(
-        "🚀 ~ file: AuthContext.tsx:75 ~ useEffect ~ cookieFallback:",
-        cookieFallback
-      );
       navigate("/sign-in");
     } else {
       navigate("/sign-up");
