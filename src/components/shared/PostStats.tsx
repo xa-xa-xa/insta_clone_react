@@ -1,12 +1,13 @@
+import { Models } from "appwrite";
+import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
+
 import {
   useDeleteSavedPost,
   useGetCurrentUser,
   useLikePost,
   useSavePost,
 } from "@/lib/react-query/queries";
-import { getLikeIconUrl } from "@/lib/utils";
-import { Models } from "appwrite";
-import { useState } from "react";
 
 type PostStatsProps = {
   post: Models.Document;
@@ -14,75 +15,89 @@ type PostStatsProps = {
 };
 
 const PostStats = ({ post, userId }: PostStatsProps) => {
-  const { mutate: likePost } = useLikePost();
-  const { mutate: savePost } = useSavePost();
-  const { mutate: deletSavedPost } = useDeleteSavedPost();
-  const { data: currentUser } = useGetCurrentUser();
+  const location = useLocation();
   const likesList = post.likes.map((user: Models.Document) => user.$id);
-  const [likes, setLikes] = useState(likesList);
+
+  const [likes, setLikes] = useState<string[]>(likesList);
   const [isSaved, setIsSaved] = useState(false);
 
-  const handleLikePost = (e: React.MouseEvent) => {
+  const { mutate: likePost } = useLikePost();
+  const { mutate: savePost } = useSavePost();
+  const { mutate: deleteSavePost } = useDeleteSavedPost();
+
+  const { data: currentUser } = useGetCurrentUser();
+
+  const savedPostRecord = currentUser?.save.find(
+    (record: Models.Document) => record.post.$id === post.$id
+  );
+
+  useEffect(() => {
+    setIsSaved(!!savedPostRecord);
+  }, [currentUser]);
+
+  const handleLikePost = (
+    e: React.MouseEvent<HTMLImageElement, MouseEvent>
+  ) => {
     e.stopPropagation();
 
-    let newLikes = [...likes];
-    const hasLiked = newLikes.includes(userId);
+    let likesArray = [...likes];
 
-    if (hasLiked) {
-      newLikes.filter((id) => id !== userId);
+    if (likesArray.includes(userId)) {
+      likesArray = likesArray.filter((Id) => Id !== userId);
     } else {
-      newLikes.push(userId);
+      likesArray.push(userId);
     }
 
-    setLikes(newLikes);
-    likePost({ postId: post.$id, likes: newLikes });
+    setLikes(likesArray);
+    likePost({ postId: post.$id, likesArray });
   };
-  const handleSavePost = (e: React.MouseEvent) => {
+
+  const handleSavePost = (
+    e: React.MouseEvent<HTMLImageElement, MouseEvent>
+  ) => {
     e.stopPropagation();
-    const savedPostRecord = currentUser?.save.find(
-      (record: Models.Document) => record.$id === post.$id
-    );
+
     if (savedPostRecord) {
       setIsSaved(false);
-      deletSavedPost(savedPostRecord?.$id);
-    } else {
-      savePost({ postId: post.$id, userId });
-      console.log("🚀 ~ handleSavePost ~ { postId: post.$id, userId }:", {
-        postId: post.$id,
-        userId,
-      });
-      setIsSaved(true);
+      return deleteSavePost(savedPostRecord.$id);
     }
+
+    savePost({ userId: userId, postId: post.$id });
+    setIsSaved(true);
   };
 
+  const containerStyles = location.pathname.startsWith("/profile")
+    ? "w-full"
+    : "";
+
   return (
-    <div className="flex justify-between items-center z-20">
+    <div
+      className={`flex justify-between items-center z-20 ${containerStyles}`}>
       <div className="flex gap-2 mr-5">
         <img
-          src={getLikeIconUrl(likes, userId)}
+          src={`${
+            likes.includes(userId)
+              ? "/assets/icons/liked.svg"
+              : "/assets/icons/like.svg"
+          }`}
           alt="like"
           width={20}
           height={20}
+          onClick={(e) => handleLikePost(e)}
           className="cursor-pointer"
-          onClick={handleLikePost}
         />
-        <div className="small-medium lg:base-medium">0</div>
+        <p className="small-medium lg:base-medium">{likes.length}</p>
       </div>
 
-      <div className="fle gap-2">
+      <div className="flex gap-2">
         <img
-          src={
-            isSaved
-              ? "/public/assets/icons/saved.svg"
-              : "/public/assets/icons/save.svg"
-          }
-          alt="like"
+          src={isSaved ? "/assets/icons/saved.svg" : "/assets/icons/save.svg"}
+          alt="share"
           width={20}
           height={20}
           className="cursor-pointer"
-          onClick={handleSavePost}
+          onClick={(e) => handleSavePost(e)}
         />
-        <p className="small-medium lg:base-medium"></p>
       </div>
     </div>
   );

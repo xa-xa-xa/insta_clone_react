@@ -1,8 +1,10 @@
-import * as z from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
-import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
 
+import Loader from "@/components/ui/Loader";
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -12,17 +14,15 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
-import Loader from "@/components/ui/Loader";
 
+import LogoImage from "@/components/shared/Logo";
+import { useUserContext } from "@/context/AuthContext";
 import {
   useCreateUserAccount,
   useSignInAccount,
 } from "@/lib/react-query/queries";
 import { SignupValidation } from "@/lib/validation";
-import { useUserContext } from "@/context/AuthContext";
-import LogoImage from "@/components/shared/Logo";
 
 const SignupForm = () => {
   const { toast } = useToast();
@@ -72,8 +72,8 @@ const SignupForm = () => {
       const isLoggedIn = await checkAuthUser();
 
       if (isLoggedIn) {
-        console.log("==>", { isLoggedIn });
         form.reset();
+
         navigate("/");
       } else {
         toast({ title: "Login failed. Please try again." });
