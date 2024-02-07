@@ -1,26 +1,24 @@
-import { Models } from "appwrite";
 import Loader from "../ui/Loader";
 import GridPostList from "./GridPostsList";
 
-type SearchResultsProps = {
+export type SearchResultProps = {
   isSearchFetching: boolean;
-  searchedPosts: Models.Document[];
+  searchedPosts: any;
 };
+
 const SearchResults = ({
   isSearchFetching,
   searchedPosts,
-}: SearchResultsProps) => {
+}: SearchResultProps) => {
   if (isSearchFetching) {
     return <Loader />;
-  }
-
-  if (searchedPosts.documents.lenght) {
+  } else if (searchedPosts && searchedPosts.documents.length > 0) {
     return <GridPostList posts={searchedPosts.documents} />;
+  } else {
+    return (
+      <p className="text-light-4 mt-10 text-center w-full">No results found</p>
+    );
   }
-
-  return (
-    <p className=" text-light-4 mt-10 text-center w-full">No Results Found</p>
-  );
 };
 
 export default SearchResults;
