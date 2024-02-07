@@ -14,23 +14,27 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "../ui/textarea";
-import FileUploader from "../shared/FileUploader";
+import { useUserContext } from "@/context/AuthContext";
+import { useCreatePost, useUpdatePost } from "@/lib/react-query/queries";
+import { toastError } from "@/lib/utils";
 import { PostValidation } from "@/lib/validation";
 import { Models } from "appwrite";
-import { useCreatePost, useSignInAccount } from "@/lib/react-query/queries";
-import { useUserContext } from "@/context/AuthContext";
-import { useToast } from "../ui";
 import { useNavigate } from "react-router-dom";
+import FileUploader from "../shared/FileUploader";
+import { useToast } from "../ui";
 import Loader from "../ui/Loader";
+import { Textarea } from "../ui/textarea";
 
 type PostFormProps = {
   post?: Models.Document;
+  action?: "Create" | "Update";
 };
 
-function PostForm({ post }: PostFormProps) {
+function PostForm({ post, action }: PostFormProps) {
   const { mutateAsync: createPost, isLoading: isLoadingCreate } =
     useCreatePost();
+  const { mutateAsync: updatePost, isLoading: processingUpdate } =
+    useUpdatePost();
   const { user } = useUserContext();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -47,6 +51,21 @@ function PostForm({ post }: PostFormProps) {
 
   // 2. Define a submit handler.
   async function onSubmit(values: z.infer<typeof PostValidation>) {
+    if (post && action === "Update") {
+      const updatedPost = await updatePost({
+        ...values,
+        postId: post.$id,
+        imageId: post?.imageId,
+        imageUrl: post?.imageUrl,
+      });
+
+      if (!updatedPost) {
+        toastError("Failed to update post. Please try again.");
+      }
+
+      return navigate(`/posts/${post.$id}`);
+    }
+
     const newPost = await createPost({ ...values, userId: user.id });
     // ✅ This will be type-safe and validated.
     if (!newPost) {
@@ -142,9 +161,9 @@ function PostForm({ post }: PostFormProps) {
           <Button
             type="submit"
             className="shad-button_primary whitespace-nowrap"
-            disabled={isLoadingCreate}>
-            {isLoadingCreate && <Loader />}
-            Post
+            disabled={isLoadingCreate || processingUpdate}>
+            {isLoadingCreate || (processingUpdate && <Loader />)}
+            {action} Post
           </Button>
         </div>
       </form>

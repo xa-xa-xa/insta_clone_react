@@ -8,27 +8,29 @@ import {
   useLikePost,
   useSavePost,
 } from "@/lib/react-query/queries";
+import Loader from "../ui/Loader";
 
 type PostStatsProps = {
-  post: Models.Document;
+  post?: Models.Document;
   userId: string;
 };
 
 const PostStats = ({ post, userId }: PostStatsProps) => {
   const location = useLocation();
-  const likesList = post.likes.map((user: Models.Document) => user.$id);
+  const likesList = post?.likes.map((user: Models.Document) => user.$id);
 
   const [likes, setLikes] = useState<string[]>(likesList);
   const [isSaved, setIsSaved] = useState(false);
 
   const { mutate: likePost } = useLikePost();
-  const { mutate: savePost } = useSavePost();
-  const { mutate: deleteSavePost } = useDeleteSavedPost();
+  const { mutate: savePost, isLoading: isSavingPost } = useSavePost();
+  const { mutate: deleteSavePost, isLoading: isDeletingSavedPost } =
+    useDeleteSavedPost();
 
   const { data: currentUser } = useGetCurrentUser();
 
   const savedPostRecord = currentUser?.save.find(
-    (record: Models.Document) => record.post.$id === post.$id
+    (record: Models.Document) => record.post?.$id === post?.$id
   );
 
   useEffect(() => {
@@ -49,7 +51,7 @@ const PostStats = ({ post, userId }: PostStatsProps) => {
     }
 
     setLikes(likesArray);
-    likePost({ postId: post.$id, likesArray });
+    likePost({ postId: post?.$id || "", likesArray });
   };
 
   const handleSavePost = (
@@ -62,7 +64,7 @@ const PostStats = ({ post, userId }: PostStatsProps) => {
       return deleteSavePost(savedPostRecord.$id);
     }
 
-    savePost({ userId: userId, postId: post.$id });
+    savePost({ userId: userId, postId: post?.$id || "" });
     setIsSaved(true);
   };
 
@@ -70,16 +72,19 @@ const PostStats = ({ post, userId }: PostStatsProps) => {
     ? "w-full"
     : "";
 
+  const getLikesIconUrl = likes.includes(userId)
+    ? "/assets/icons/liked.svg"
+    : "/assets/icons/like.svg";
+  const getSavesIconUrl = isSaved
+    ? "/assets/icons/saved.svg"
+    : "/assets/icons/save.svg";
+
   return (
     <div
       className={`flex justify-between items-center z-20 ${containerStyles}`}>
       <div className="flex gap-2 mr-5">
         <img
-          src={`${
-            likes.includes(userId)
-              ? "/assets/icons/liked.svg"
-              : "/assets/icons/like.svg"
-          }`}
+          src={getLikesIconUrl}
           alt="like"
           width={20}
           height={20}
@@ -90,14 +95,18 @@ const PostStats = ({ post, userId }: PostStatsProps) => {
       </div>
 
       <div className="flex gap-2">
-        <img
-          src={isSaved ? "/assets/icons/saved.svg" : "/assets/icons/save.svg"}
-          alt="share"
-          width={20}
-          height={20}
-          className="cursor-pointer"
-          onClick={(e) => handleSavePost(e)}
-        />
+        {isSavingPost || isDeletingSavedPost ? (
+          <Loader />
+        ) : (
+          <img
+            src={getSavesIconUrl}
+            alt="share"
+            width={20}
+            height={20}
+            className="cursor-pointer"
+            onClick={(e) => handleSavePost(e)}
+          />
+        )}
       </div>
     </div>
   );

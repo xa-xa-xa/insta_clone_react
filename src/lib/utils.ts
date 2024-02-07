@@ -69,7 +69,10 @@ export const getLikeIconUrl = (likeList: string[], userId: string): string => {
     : "/public/assets/icons/like.svg";
 };
 
-export function formatRelativeDate(dateString: string): string {
+export function formatRelativeDate(dateString?: string): string {
+  if (!dateString) {
+    return "";
+  }
   const currentDate = new Date();
   const inputDate = new Date(dateString);
 

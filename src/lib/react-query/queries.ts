@@ -75,6 +75,7 @@ export const useGetUserPosts = (userId?: string) => {
 
 export const useUpdatePost = () => {
   const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: (post: IUpdatePost) => updatePost(post),
     onSuccess: (data) => {
@@ -87,6 +88,7 @@ export const useUpdatePost = () => {
 
 export const useDeletePost = () => {
   const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: ({ postId, imageId }: { postId?: string; imageId: string }) =>
       deletePost(postId, imageId),
