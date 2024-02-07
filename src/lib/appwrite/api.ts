@@ -218,12 +218,12 @@ export async function deleteFile(fileId: string) {
 }
 
 // ============================== GET POSTS
-export async function searchPosts(searchTerm: string) {
+export async function searchPosts(query: string) {
   try {
     const posts = await databases.listDocuments(
       appwriteConfig.databaseId,
       appwriteConfig.postCollectionId,
-      [Query.search("caption", searchTerm)]
+      [Query.search("caption", query)]
     );
 
     if (!posts) {
