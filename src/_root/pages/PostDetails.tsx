@@ -2,16 +2,32 @@ import PostStats from "@/components/shared/PostStats";
 import { Button } from "@/components/ui";
 import Loader from "@/components/ui/Loader";
 import { useUserContext } from "@/context/AuthContext";
-import { useGetPostById } from "@/lib/react-query/queries";
+import { useDeletePost, useGetPostById } from "@/lib/react-query/queries";
 import { formatRelativeDate } from "@/lib/utils";
-import { Link, useParams } from "react-router-dom";
+import { Models } from "appwrite";
+import { Link, useNavigate, useParams } from "react-router-dom";
 
 function PostDetails() {
+  const navigate = useNavigate();
   const { id } = useParams();
   const { data: post, isLoading } = useGetPostById(id);
+
   const { user } = useUserContext();
 
-  const handleDeletePost = (event) => {};
+  const { mutate: deletePost } = useDeletePost();
+
+  // FIXME: KNOWN ISSUE: The delete does not work properly with appwrite for documents with
+  // relationship attributes. Need to whatch out for the fix on appwrite side
+  // const [isDeleted, setIsDeleted] = useState(false);
+  const handleDeletePost = (
+    e: React.MouseEvent<HTMLImageElement, MouseEvent>,
+    post: Models.Document
+  ) => {
+    e.stopPropagation();
+
+    deletePost({ postId: id, imageId: post.imageId });
+    navigate(-1);
+  };
 
   return (
     <div className="post_details-container">
@@ -62,7 +78,7 @@ function PostDetails() {
                 </Link>
 
                 <Button
-                  onClick={handleDeletePost}
+                  onClick={(e) => handleDeletePost(e, post)}
                   variant="ghost"
                   className={`ghost_details-delte_btn ${
                     user?.id !== post?.creator.$id && "hidden"
@@ -72,6 +88,8 @@ function PostDetails() {
                     alt="delete"
                     width={24}
                     height={24}
+                    itemID={post?.imageId}
+                    id={post?.creator.$id}
                   />
                 </Button>
               </div>

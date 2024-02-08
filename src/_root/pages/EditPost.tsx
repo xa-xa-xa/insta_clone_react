@@ -6,7 +6,6 @@ import { useParams } from "react-router-dom";
 function EditPost() {
   const { id } = useParams();
   const { data: post, isLoading } = useGetPostById(id || "");
-  console.log("🚀 ~ EditPost ~ post:", post);
 
   if (isLoading) {
     return <Loader />;
