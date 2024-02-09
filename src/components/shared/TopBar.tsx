@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useUserContext } from "@/context/AuthContext";
 import { useSignOutAccount } from "@/lib/react-query/queries";
 import { Button } from "../ui/button";
+import LogoImage from "./Logo";
 
 const Topbar = () => {
   const navigate = useNavigate();
@@ -18,12 +19,10 @@ const Topbar = () => {
     <section className="topbar">
       <div className="flex-between py-4 px-5">
         <Link to="/" className="flex gap-3 items-center">
-          <img
-            src="/assets/images/logo.svg"
-            alt="logo"
-            width={130}
-            height={325}
-          />
+          <div className="flex items-center">
+            <LogoImage width={36} />
+            <div className="h3-bold">InstaClone</div>
+          </div>
         </Link>
 
         <div className="flex gap-4">

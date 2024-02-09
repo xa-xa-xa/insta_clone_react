@@ -22,7 +22,8 @@ function LeftSideBar() {
     <nav className="leftsidebar">
       <div className="flex flex-col gap-11">
         <Link to="/" className="flex gap-3 items-center">
-          <LogoImage width={170} height={36} />
+          <LogoImage width={40} />
+          <span className="h1-bold">InstaClone</span>
         </Link>
         <Link to={`/profile/${user.id}`} className="flex gap-3 items-center">
           <img

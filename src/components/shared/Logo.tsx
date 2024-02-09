@@ -8,8 +8,8 @@ interface LogoImgProps {
 
 function LogoImage({
   alt = "logo",
-  width = undefined,
-  height = undefined,
+  width = 36,
+  height = 36,
   src = "/assets/images/logo.svg",
   className = "",
 }: LogoImgProps) {

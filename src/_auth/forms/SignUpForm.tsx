@@ -88,7 +88,10 @@ const SignupForm = () => {
   return (
     <Form {...form}>
       <div className="sm:w-420 flex-center flex-col">
-        <LogoImage />
+        <div className="flex items-center">
+          <LogoImage width={120} />
+          <div className="h1-bold">InstaClone</div>
+        </div>
         <h2 className="h3-bold md:h2-bold pt-5 sm:pt-12">
           Create a new account
         </h2>
