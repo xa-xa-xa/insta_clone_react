@@ -20,9 +20,8 @@ import { toastError } from "@/lib/utils";
 import { PostValidation } from "@/lib/validation";
 import { Models } from "appwrite";
 import { useNavigate } from "react-router-dom";
-import FileUploader from "../shared/FileUploader";
+import { FileUploader, Loader } from "../shared";
 import { useToast } from "../ui";
-import Loader from "../ui/Loader";
 import { Textarea } from "../ui/textarea";
 
 type PostFormProps = {

@@ -1,5 +1,5 @@
-import Loader from "../ui/Loader";
 import GridPostList from "./GridPostsList";
+import Loader from "./Loader";
 
 export type SearchResultProps = {
   isSearchFetching: boolean;

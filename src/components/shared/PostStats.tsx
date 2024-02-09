@@ -8,7 +8,7 @@ import {
   useLikePost,
   useSavePost,
 } from "@/lib/react-query/queries";
-import Loader from "../ui/Loader";
+import Loader from "./Loader";
 
 type PostStatsProps = {
   post?: Models.Document;
