@@ -60,9 +60,7 @@ const SigninForm = () => {
       const isLoggedIn = await checkAuthUser();
 
       if (isLoggedIn) {
-        console.log({ isLoggedIn }, "==> navigating...");
         form.reset();
-        console.log({ isLoggedIn });
 
         navigate("/");
       } else {
