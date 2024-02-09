@@ -1,6 +1,4 @@
-import { Outlet, Navigate } from "react-router-dom";
-
-import { useUserContext } from "@/context/AuthContext";
+import { Navigate, Outlet } from "react-router-dom";
 
 export default function AuthLayout() {
   const isAuthenticated = false;

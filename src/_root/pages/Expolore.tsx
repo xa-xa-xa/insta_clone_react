@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { useInView } from "react-intersection-observer";
 
-import { GridPostList, Loader } from "@/components/shared";
+import GridPostList from "@/components/shared/GridPostsList";
 import { Input } from "@/components/ui";
 import useDebounce from "@/hooks/useDebounce";
 import { useGetPosts, useSearchPosts } from "@/lib/react-query/queries";
+import { Loader } from "lucide-react";
 
 export type SearchResultProps = {
   isSearchFetching: boolean;

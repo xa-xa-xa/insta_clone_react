@@ -1,23 +1,24 @@
-import PostCard from "@/components/shared/PostCard";
-import UserCard from "@/components/shared/UserCard";
-import Loader from "@/components/ui/Loader";
-import { useGetRecentPosts, useGetUsers } from "@/lib/react-query/queries";
 import { Models } from "appwrite";
 
+// import { useToast } from "@/components/ui/use-toast";
+import PostCard from "@/components/shared/PostCard";
+import UserCard from "@/components/shared/UserCard";
+import { useGetRecentPosts, useGetUsers } from "@/lib/react-query/queries";
+import { Loader } from "lucide-react";
+
 const Home = () => {
+  // const { toast } = useToast();
+
   const {
     data: posts,
-    isLoading: isPostsLoading,
+    isLoading: isPostLoading,
     isError: isErrorPosts,
   } = useGetRecentPosts();
-  const isPostLoadiing = true;
-
   const {
     data: creators,
     isLoading: isUserLoading,
     isError: isErrorCreators,
   } = useGetUsers(10);
-  console.log("🚀 ~ Home ~ creators:", creators);
 
   if (isErrorPosts || isErrorCreators) {
     return (
@@ -37,17 +38,20 @@ const Home = () => {
       <div className="home-container">
         <div className="home-posts">
           <h2 className="h3-bold md:h2-bold text-left w-full">Home Feed</h2>
-          {isPostsLoading && !posts ? (
+          {isPostLoading && !posts ? (
             <Loader />
           ) : (
-            <ul className="flex flex-col flex-1 gap-9 w-full">
+            <ul className="flex flex-col flex-1 gap-9 w-full ">
               {posts?.documents.map((post: Models.Document) => (
-                <PostCard post={post} key={post.$id} />
+                <li key={post.$id} className="flex justify-center w-full">
+                  <PostCard post={post} />
+                </li>
               ))}
             </ul>
           )}
         </div>
       </div>
+
       <div className="home-creators">
         <h3 className="h3-bold text-light-1">Top Creators</h3>
         {isUserLoading && !creators ? (

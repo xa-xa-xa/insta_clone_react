@@ -1,5 +1,3 @@
-import React from "react";
-
 interface LogoImgProps {
   width?: number;
   height?: number;
